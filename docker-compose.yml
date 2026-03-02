@@ -7,6 +7,7 @@ services:
         condition: service_healthy
       frontend:
         condition: service_healthy
+    # Public entrypoint for the stack (keep exposed)
     ports:
       - "80:80"
       - "443:443"
@@ -110,12 +111,12 @@ services:
         chmod 600 $${PGPASS_PATH};
       fi &&
       while true; do
-        FILE=/backups/backup-$(date -u +%Y%m%dT%H%M%SZ).sql.gz &&
+        FILE=/backups/backup-$(date -u +%Y-%m-%dT%H:%M:%SZ).sql.gz &&
         echo \"[backup] writing $${FILE}\" &&
-        if PGPASSFILE=$${PGPASS_PATH} pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} | gzip > $${FILE}; then
-          find /backups -type f -mtime +$${BACKUP_RETENTION_DAYS:-7} -delete;
-          echo \"[backup] completed $${FILE}\";
-        else
+      if PGPASSFILE=$${PGPASS_PATH} pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} | gzip > $${FILE}; then
+        find /backups -type f -mtime +$${BACKUP_RETENTION_DAYS:-7} -delete;
+        echo \"[backup] completed $${FILE}\";
+      else
           echo \"[backup] failed to write $${FILE}\" >&2;
         fi &&
         sleep $${BACKUP_INTERVAL_SECONDS:-86400};

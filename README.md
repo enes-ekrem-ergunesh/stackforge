@@ -64,3 +64,34 @@ services:
     ports:
       - "5432:5432"
 ```
+
+**Using Docker secrets for credentials (example)**
+
+Create an override file to supply secrets instead of environment variables for production:
+
+```yaml
+services:
+  backend:
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url
+    secrets:
+      - database_url
+  db:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+  backup:
+    environment:
+      PGPASSFILE: /run/secrets/db_pgpass
+    secrets:
+      - db_pgpass
+
+secrets:
+  database_url:
+    file: ./secrets/database_url.example
+  db_password:
+    file: ./secrets/db_password.example
+  db_pgpass:
+    file: ./secrets/db_pgpass.example
+```
