@@ -47,3 +47,20 @@ Healthchecks and `depends_on` ensure services start in order. Backend and databa
 **Production hardening**
 - Prefer Docker secrets or an external secret manager for database credentials and other secrets.
 - Remove host `ports` mappings for backend/frontend/database so only NGINX is publicly reachable; services still communicate over the `internal` network.
+
+**Local development override (example)**
+
+Create a `docker-compose.override.yml` to expose ports only on your workstation:
+
+```yaml
+services:
+  backend:
+    ports:
+      - "3000:3000"
+  frontend:
+    ports:
+      - "4200:4200"
+  db:
+    ports:
+      - "5432:5432"
+```
