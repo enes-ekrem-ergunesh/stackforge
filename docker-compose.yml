@@ -102,7 +102,7 @@ services:
 
   backup:
     image: postgres:16-alpine
-    restart: unless-stopped
+    restart: on-failure
     env_file:
       - .env
     command: >
@@ -110,7 +110,12 @@ services:
       while true; do
         FILE=/backups/backup-$(date +%Y%m%d%H%M%S).sql &&
         echo \"[backup] writing $${FILE}\" &&
-        PGPASSWORD=$${POSTGRES_PASSWORD} pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} > $${FILE} &&
+        if PGPASSWORD=$${POSTGRES_PASSWORD} pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} > $${FILE}; then
+          echo \"[backup] completed $${FILE}\" &&
+          find /backups -type f -mtime +$${BACKUP_RETENTION_DAYS:-7} -delete;
+        else
+          echo \"[backup] failed to write $${FILE}\" >&2;
+        fi &&
         sleep $${BACKUP_INTERVAL_SECONDS:-86400};
       done"
     volumes:
