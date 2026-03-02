@@ -35,7 +35,7 @@ services:
       - .env
     environment:
       # Service-to-service connection using Docker DNS
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Use Docker secrets for production
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Use Docker secrets for production; avoid env credentials
       SWAGGER_PATH: /docs
     # Remove or comment out in production; expose only via NGINX.
     ports:
@@ -88,7 +88,7 @@ services:
     env_file:
       - .env
     ports:
-      # Remove or comment out in production; expose only via NGINX.
+      # Remove in production; database must stay private and is not proxied by NGINX.
       - "${POSTGRES_HOST_PORT:-5432}:5432" # Optional exposure for local development
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -105,10 +105,10 @@ services:
 
   backup:
     image: postgres:16-alpine
-    restart: unless-stopped
+    restart: on-failure
     env_file:
       - .env
-    # For production, prefer Docker secrets or externalized pgpass provisioning.
+    # For production, prefer Docker secrets or externalized pgpass provisioning; this runtime file is for local/dev convenience.
     command: >
       sh -c "mkdir -p /backups &&
       echo \"db:5432:$${POSTGRES_DB}:$${POSTGRES_USER}:$${POSTGRES_PASSWORD}\" > /root/.pgpass &&

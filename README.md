@@ -46,4 +46,4 @@ Healthchecks and `depends_on` ensure services start in order. Backend and databa
 
 **Production hardening**
 - Prefer Docker secrets or an external secret manager for database credentials and other secrets.
-- Remove host `ports` mappings for backend/frontend/database so only NGINX is publicly reachable.
+- Remove host `ports` mappings for backend/frontend/database so only NGINX is publicly reachable; services still communicate over the `internal` network.
