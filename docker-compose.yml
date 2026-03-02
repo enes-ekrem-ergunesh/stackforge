@@ -107,12 +107,12 @@ services:
       - .env
     command: >
       sh -c "mkdir -p /backups &&
-      echo \"db:5432:$${POSTGRES_DB}:$${POSTGRES_USER}:$${POSTGRES_PASSWORD}\" > /tmp/.pgpass &&
-      chmod 600 /tmp/.pgpass &&
+      echo \"db:5432:$${POSTGRES_DB}:$${POSTGRES_USER}:$${POSTGRES_PASSWORD}\" > /root/.pgpass &&
+      chmod 600 /root/.pgpass &&
       while true; do
         FILE=/backups/backup-$(date +%Y%m%d%H%M%S).sql.gz &&
         echo \"[backup] writing $${FILE}\" &&
-        if PGPASSFILE=/tmp/.pgpass pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} | gzip > $${FILE}; then
+        if PGPASSFILE=/root/.pgpass pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} | gzip > $${FILE}; then
           echo \"[backup] completed $${FILE}\" &&
           find /backups -type f -mtime +$${BACKUP_RETENTION_DAYS:-7} -delete;
         else
@@ -135,7 +135,7 @@ services:
     restart: "no"
     env_file:
       - .env
-    command: ["tail", "-f", "/dev/null"] # Exec into this container to run psql/pg_restore manually
+    command: ["sleep", "infinity"] # Exec into this container to run psql/pg_restore manually
     volumes:
       - backup_data:/backups
     depends_on:
