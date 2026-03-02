@@ -102,15 +102,17 @@ services:
 
   backup:
     image: postgres:16-alpine
-    restart: on-failure
+    restart: unless-stopped
     env_file:
       - .env
     command: >
       sh -c "mkdir -p /backups &&
+      echo \"db:5432:$${POSTGRES_DB}:$${POSTGRES_USER}:$${POSTGRES_PASSWORD}\" > /tmp/.pgpass &&
+      chmod 600 /tmp/.pgpass &&
       while true; do
-        FILE=/backups/backup-$(date +%Y%m%d%H%M%S).sql &&
+        FILE=/backups/backup-$(date +%Y%m%d%H%M%S).sql.gz &&
         echo \"[backup] writing $${FILE}\" &&
-        if PGPASSWORD=$${POSTGRES_PASSWORD} pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} > $${FILE}; then
+        if PGPASSFILE=/tmp/.pgpass pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} | gzip > $${FILE}; then
           echo \"[backup] completed $${FILE}\" &&
           find /backups -type f -mtime +$${BACKUP_RETENTION_DAYS:-7} -delete;
         else
