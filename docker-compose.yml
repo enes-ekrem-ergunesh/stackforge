@@ -37,6 +37,7 @@ services:
       # Service-to-service connection using Docker DNS
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Use Docker secrets for production
       SWAGGER_PATH: /docs
+    # Remove or comment out in production; expose only via NGINX.
     ports:
       - "${BACKEND_HOST_PORT:-3000}:3000" # Optional exposure for local development
     networks:
@@ -64,6 +65,7 @@ services:
     env_file:
       - .env
     ports:
+      # Remove or comment out in production; expose only via NGINX.
       - "${FRONTEND_HOST_PORT:-4200}:4200" # Optional exposure for local development/PWA testing
     networks:
       - internal
@@ -86,6 +88,7 @@ services:
     env_file:
       - .env
     ports:
+      # Remove or comment out in production; expose only via NGINX.
       - "${POSTGRES_HOST_PORT:-5432}:5432" # Optional exposure for local development
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -114,8 +117,8 @@ services:
         FILE=/backups/backup-$(date -u +%Y%m%dT%H%M%SZ).sql.gz &&
         echo \"[backup] writing $${FILE}\" &&
         if PGPASSFILE=/root/.pgpass pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} | gzip > $${FILE}; then
-          echo \"[backup] completed $${FILE}\" &&
           find /backups -type f -mtime +$${BACKUP_RETENTION_DAYS:-7} -delete;
+          echo \"[backup] completed $${FILE}\";
         else
           echo \"[backup] failed to write $${FILE}\" >&2;
         fi &&

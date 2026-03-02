@@ -43,3 +43,7 @@ docker compose up -d --build
 ```
 
 Healthchecks and `depends_on` ensure services start in order. Backend and database ports can be exposed for local development via `.env`. Backups run periodically with optional `BACKUP_RETENTION_DAYS`; use the `restore` service to apply dumps from `backup_data`. NGINX listens on 80 (HTTP→HTTPS redirect) and 443 (requires certs in `certs` volume).
+
+**Production hardening**
+- Prefer Docker secrets or an external secret manager for database credentials and other secrets.
+- Remove host `ports` mappings for backend/frontend/database so only NGINX is publicly reachable.
