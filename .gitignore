@@ -1,0 +1,4 @@
+.env
+certs/*.pem
+backend/node_modules/
+frontend/node_modules/
