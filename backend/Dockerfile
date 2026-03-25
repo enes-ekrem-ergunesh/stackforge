@@ -1,26 +1,15 @@
-FROM node:22.14.0-alpine3.21 AS build
+FROM python:3.13.2-alpine3.21
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-COPY tsconfig.json tsconfig.build.json nest-cli.json ./
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY src ./src
-
-RUN npm run build
-RUN npm prune --omit=dev
-
-FROM node:22.14.0-alpine3.21 AS runtime
-
-WORKDIR /app
-
-ENV NODE_ENV=production
-
-COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "3000"]

@@ -1,12 +1,12 @@
 # stackforge
 
-Production-ready full-stack template with initialized NestJS backend + Angular frontend, wired for both coding and deployment.
+Production-ready full-stack template with initialized FastAPI backend + Angular frontend, wired for both coding and deployment.
 
 ## Included projects
 
 ```
 .
-├── backend/          # NestJS project (source + config files)
+├── backend/          # FastAPI project (source + config files)
 ├── frontend/         # Angular project (source + config files)
 ├── nginx/            # Reverse proxy config (nginx.conf)
 ├── docker-compose.yml
@@ -18,7 +18,7 @@ No generated runtime artifacts are committed (`node_modules`, build output, cert
 ## Pinned versions
 
 - Node.js: `22.14.0` (Docker + `.nvmrc`)
-- NestJS packages: pinned exact versions in `backend/package.json`
+- FastAPI packages: pinned exact versions in `backend/requirements.txt`
 - Angular packages: pinned exact versions in `frontend/package.json`
 - PostgreSQL image: `16.8-alpine`
 - NGINX image: `1.26.3-alpine`
@@ -26,7 +26,7 @@ No generated runtime artifacts are committed (`node_modules`, build output, cert
 ## Service topology
 
 - `nginx`: public ingress (`80`/`443` host ports configurable via `.env`)
-- `backend`: NestJS API on container `3000`, local host bind `127.0.0.1:${BACKEND_HOST_PORT}`
+- `backend`: FastAPI API on container `3000`, local host bind `127.0.0.1:${BACKEND_HOST_PORT}`
 - `frontend`: Angular static app on container `4200`, local host bind `127.0.0.1:${FRONTEND_HOST_PORT}`
 - `db`: PostgreSQL on container `5432`, local host bind `127.0.0.1:${POSTGRES_HOST_PORT}`
 - `backup` + `restore`: DB backup/restore helpers
@@ -83,7 +83,7 @@ Then start the stack:
 docker compose up -d
 ```
 
-- **Backend**: `npm run start:dev` watches `backend/src/*` for changes; rebuild on save via NestJS hot-reload.
+- **Backend**: `uvicorn src.main:app --reload` watches `backend/src/*` for changes and reloads the API server.
 - **Frontend**: `npx ng serve` watches `frontend/src/*` with 500ms polling; Angular HMR updates component in browser without full page reload.
 
 Both are accessible on `127.0.0.1:${BACKEND_HOST_PORT}` and `127.0.0.1:${FRONTEND_HOST_PORT}` respectively.
@@ -91,14 +91,14 @@ Both are accessible on `127.0.0.1:${BACKEND_HOST_PORT}` and `127.0.0.1:${FRONTEN
 **How live reload works:**
 - Edit any file in `backend/src` or `frontend/src`, save it.
 - Container detects the change within 500ms.
-- Backend rebuilds TypeScript (~7s); frontend rebuilds with HMR (~0.25s).
+- Backend reloads Python app (~sub-second); frontend rebuilds with HMR (~0.25s).
 - Browser receives the update and applies it without full page reload.
 - For frontend, if you encounter issues with HMR, refresh the page manually.
 
 ### Option 2: Host-run development mode (manual)
 
 ```bash
-cd backend && npm install && npm run start:dev
+cd backend && python -m pip install -r requirements.txt && python -m uvicorn src.main:app --host 0.0.0.0 --port 3000 --reload
 cd frontend && npm install && npm run start
 ```
 
