@@ -1,6 +1,6 @@
 services:
   nginx:
-    image: nginx:1.25-alpine
+    image: nginx:1.26.3-alpine
     restart: unless-stopped
     depends_on:
       backend:
@@ -38,6 +38,8 @@ services:
       # Service-to-service connection using Docker DNS
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Use Docker secrets for production; avoid env credentials
       SWAGGER_PATH: /docs
+    ports:
+      - "127.0.0.1:${BACKEND_HOST_PORT:-3000}:3000"
     networks:
       - internal
     healthcheck:
@@ -62,6 +64,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    ports:
+      - "127.0.0.1:${FRONTEND_HOST_PORT:-4200}:4200"
     networks:
       - internal
     healthcheck:
@@ -78,12 +82,14 @@ services:
       description: "Angular PWA frontend served behind NGINX"
 
   db:
-    image: postgres:16-alpine
+    image: postgres:16.8-alpine
     restart: unless-stopped
     env_file:
       - .env
     volumes:
       - db_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
     networks:
       - internal
     healthcheck:
@@ -96,7 +102,7 @@ services:
       description: "PostgreSQL database with persistent volume"
 
   backup:
-    image: postgres:16-alpine
+    image: postgres:16.8-alpine
     restart: on-failure
     env_file:
       - .env
@@ -132,7 +138,7 @@ services:
       description: "Periodic PostgreSQL dumps + volume backups"
 
   restore:
-    image: postgres:16-alpine
+    image: postgres:16.8-alpine
     restart: "no"
     env_file:
       - .env
