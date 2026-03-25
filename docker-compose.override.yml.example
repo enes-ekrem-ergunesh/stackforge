@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    command: npm run start:dev
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/tsconfig.json:/app/tsconfig.json
+      - ./backend/tsconfig.build.json:/app/tsconfig.build.json
+      - ./backend/nest-cli.json:/app/nest-cli.json
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - "127.0.0.1:${BACKEND_HOST_PORT:-3000}:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    command: npx ng serve --host 0.0.0.0 --port 4200 --poll 2000
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/angular.json:/app/angular.json
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tsconfig.app.json:/app/tsconfig.app.json
+      - /app/node_modules
+    ports:
+      - "127.0.0.1:${FRONTEND_HOST_PORT:-4200}:4200"

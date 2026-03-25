@@ -69,14 +69,22 @@ Edit source files directly:
 
 ### Option 1: Live reload (with Docker) — recommended for development
 
-The `docker-compose.override.yml` file automatically enables live reload for both backend and frontend:
+The `docker-compose.override.yml` file automatically enables live reload for both backend and frontend. 
+
+**First-time setup**: Copy the example override file:
+
+```bash
+cp docker-compose.override.yml.example docker-compose.override.yml
+```
+
+Then start the stack:
 
 ```bash
 docker compose up -d
 ```
 
 - **Backend**: `npm run start:dev` watches `backend/src/*` for changes; reload on save via NestJS hot-reload.
-- **Frontend**: `ng serve` watches `frontend/src/*` for changes; reload on save via Angular's dev server.
+- **Frontend**: `npx ng serve` watches `frontend/src/*` for changes; reload on save via Angular's dev server.
 
 Both are accessible on `127.0.0.1:${BACKEND_HOST_PORT}` and `127.0.0.1:${FRONTEND_HOST_PORT}` respectively.
 
