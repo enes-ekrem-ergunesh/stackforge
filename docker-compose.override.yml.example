@@ -18,7 +18,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    command: npx ng serve --host 0.0.0.0 --port 4200 --poll 2000
+    command: npx ng serve --host 0.0.0.0 --port 4200 --poll 500
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/angular.json:/app/angular.json
