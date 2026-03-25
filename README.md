@@ -83,10 +83,17 @@ Then start the stack:
 docker compose up -d
 ```
 
-- **Backend**: `npm run start:dev` watches `backend/src/*` for changes; reload on save via NestJS hot-reload.
-- **Frontend**: `npx ng serve` watches `frontend/src/*` for changes; reload on save via Angular's dev server.
+- **Backend**: `npm run start:dev` watches `backend/src/*` for changes; rebuild on save via NestJS hot-reload.
+- **Frontend**: `npx ng serve` watches `frontend/src/*` with 500ms polling; Angular HMR updates component in browser without full page reload.
 
 Both are accessible on `127.0.0.1:${BACKEND_HOST_PORT}` and `127.0.0.1:${FRONTEND_HOST_PORT}` respectively.
+
+**How live reload works:**
+- Edit any file in `backend/src` or `frontend/src`, save it.
+- Container detects the change within 500ms.
+- Backend rebuilds TypeScript (~7s); frontend rebuilds with HMR (~0.25s).
+- Browser receives the update and applies it without full page reload.
+- For frontend, if you encounter issues with HMR, refresh the page manually.
 
 ### Option 2: Host-run development mode (manual)
 
