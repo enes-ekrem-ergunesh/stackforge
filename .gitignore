@@ -2,3 +2,6 @@
 certs/*.pem
 backend/node_modules/
 frontend/node_modules/
+docker-compose.override.yml
+backend/.angular/
+frontend/.angular/
