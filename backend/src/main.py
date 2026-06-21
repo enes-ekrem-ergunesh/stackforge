@@ -5,6 +5,7 @@ app = FastAPI(
     title="Stackforge API",
     description="FastAPI API template",
     version="1.0.0",
+    openapi_url="/api/openapi.json",
 )
 
 
