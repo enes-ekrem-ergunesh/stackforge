@@ -23,3 +23,8 @@ services:
       - /app/node_modules
     ports:
       - "127.0.0.1:${FRONTEND_HOST_PORT:-4200}:4200"
+
+  pgadmin:
+    environment:
+      # Run in desktop mode locally to bypass authentication screen
+      PGADMIN_CONFIG_SERVER_MODE: "False"

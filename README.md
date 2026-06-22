@@ -29,6 +29,7 @@ No generated runtime artifacts are committed (`node_modules`, build output, cert
 - `backend`: FastAPI API on container `3000`, local host bind `127.0.0.1:${BACKEND_HOST_PORT}`
 - `frontend`: Angular static app on container `4200`, local host bind `127.0.0.1:${FRONTEND_HOST_PORT}`
 - `db`: PostgreSQL on container `5432`, local host bind `127.0.0.1:${POSTGRES_HOST_PORT}`
+- `pgadmin`: pgAdmin 4 UI
 - `backup` + `restore`: DB backup/restore helpers
 
 Networks:
@@ -58,6 +59,7 @@ docker compose up -d --build
 - Backend API: `http://127.0.0.1:${BACKEND_HOST_PORT}/api`
 - Swagger: `http://127.0.0.1:${BACKEND_HOST_PORT}/docs`
 - Frontend: `http://127.0.0.1:${FRONTEND_HOST_PORT}`
+- pgAdmin: `http://localhost:${NGINX_HTTP_PORT}/pgadmin`
 
 If port `80`/`443` is occupied locally, set `NGINX_HTTP_PORT` / `NGINX_HTTPS_PORT` (for example `8080` / `8443`).
 
@@ -94,6 +96,9 @@ Both are accessible on `127.0.0.1:${BACKEND_HOST_PORT}` and `127.0.0.1:${FRONTEN
 - Backend reloads Python app (~sub-second); frontend rebuilds with HMR (~0.25s).
 - Browser receives the update and applies it without full page reload.
 - For frontend, if you encounter issues with HMR, refresh the page manually.
+
+**Authentication Note:** 
+When running with the `docker-compose.override.yml`, pgAdmin is configured to start in Desktop mode (`SERVER_MODE="False"`). This disables the authentication requirement entirely, allowing you to bypass the login screen during local development.
 
 ### Option 2: Host-run development mode (manual)
 

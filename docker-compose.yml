@@ -100,6 +100,31 @@ services:
     labels:
       description: "PostgreSQL database with persistent volume"
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+    entrypoint: >
+      /bin/sh -c '
+      echo "db:5432:$${POSTGRES_DB}:$${POSTGRES_USER}:$${POSTGRES_PASSWORD}" > /tmp/pgpass &&
+      chmod 600 /tmp/pgpass &&
+      echo "{\"Servers\": {\"1\": {\"Name\": \"$${POSTGRES_DB} (Docker)\", \"Group\": \"Servers\", \"Host\": \"db\", \"Port\": 5432, \"MaintenanceDB\": \"$${POSTGRES_DB}\", \"Username\": \"$${POSTGRES_USER}\", \"SSLMode\": \"prefer\", \"PassFile\": \"/tmp/pgpass\"}}}" > /tmp/servers.json &&
+      export PGADMIN_SERVER_JSON_FILE=/tmp/servers.json &&
+      exec /entrypoint.sh'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+    labels:
+      description: "pgAdmin 4 for database management"
+
   backup:
     image: postgres:16.8-alpine
     restart: on-failure
